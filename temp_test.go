@@ -8,9 +8,17 @@ import (
 )
 
 func TestTempCall(t *testing.T) {
-	err := Temp("", "", func(f *os.File) error {
-		assert.Nil(t, f)
-		return nil
-	})
-	assert.NoError(t, err)
+	var name string
+
+	assert.NoError(t,
+		Temp("", "", func(f *os.File) error {
+			if !assert.NotNil(t, f) {
+				t.FailNow()
+			}
+			name = f.Name()
+			t.Logf("created file %q", name)
+			return nil
+		}),
+	)
+	assert.NoError(t, os.Remove(name))
 }
