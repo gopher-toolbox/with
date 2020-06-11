@@ -23,3 +23,21 @@ func Temp(dir, pattern string, f func(f *os.File) error) (err error) {
 	err = f(t)
 	return
 }
+
+// TempDir creates a temporary directory using ioutil.TempDir and calls
+// function f. Then it removes the directory with all its content upon f exit.
+func TempDir(dir, pattern string, f func(name string) error) (err error) {
+	var name string
+	name, err = ioutil.TempDir(dir, pattern)
+	if err != nil {
+		return
+	}
+	defer func() {
+		if errR := os.RemoveAll(name); err == nil {
+			err = errR
+		}
+	}()
+
+	err = f(name)
+	return
+}

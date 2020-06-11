@@ -37,3 +37,24 @@ func TestTempError(t *testing.T) {
 		assert.NoError(t, os.Remove(name))
 	}
 }
+
+func TestTempDirCall(t *testing.T) {
+	assert.NoError(t,
+		TempDir("", "", func(name string) error {
+			if !assert.NotEmpty(t, name) {
+				t.FailNow()
+			}
+			t.Logf("created directory %q", name)
+			return nil
+		}),
+	)
+}
+
+func TestTempDirError(t *testing.T) {
+	assert.Error(t,
+		TempDir("/the/directory/which/should/not/exist", "", func(name string) error {
+			t.Logf("created directory %q", name)
+			return nil
+		}),
+	)
+}
